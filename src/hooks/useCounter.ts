@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-export default function useCounter() {
-  let [number, setNumber] = useState(1);
+export default function useCounter(initialNumber = 1) {
+  let [number, setNumber] = useState(initialNumber);
 
   useEffect(() => {
     setTimeout(() => {
-      setNumber(4);
+      setNumber(number + 1);
     }, 5000);
   }, []);
 
