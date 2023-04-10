@@ -1,31 +1,42 @@
-import { useEffect, useRef } from 'react';
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
-import PeopleList from './PeopleList';
-import useCounter from './hooks/useCounter';
+import ScrollableBox, { ScrollableRef } from './ScrollableBox';
+
+
 
 function App() {
-  const number = useCounter(9)
-  /* consr counter = {current:2} */
-  const counter = useRef(2)
-  const div = useRef<HTMLDivElement>(null)
+  const boxRef = useRef<ScrollableRef>(null)
+  const [content, setContent] = useState<string>()
+  const [postId, setPostId] = useState(1)
+
+
+  const fetchData = useCallback(async function () {
+    const response = await fetch(
+      `https://jsonplaceholder.typicode.com/post/${postId}`
+    )
+    const data = await response.json()
+    setContent(data.body)
+  }, [postId])
 
   useEffect(() => {
-    if (div.current) {
-      div.current.style.backgroundColor = '#09f'
-    }
-  }, [])
+    fetchData()
+  }, [fetchData])
 
+  //const data = Array(30_000_000).fill({ foo: "bar" })
+  const data = useMemo(() => Array(30_000_000).fill({ foo: "bar" }), [])
 
-  return (
-    <div className="App" ref={div}>
-      {number}
-      <div style={{ backgroundColor: 'peachpuff' }}>
-        {counter.current}
-      </div>
-      <PeopleList />
-      <PeopleList />
-    </div>
-  );
+  return <div className='App'>
+    {postId}
+    <ScrollableBox ref={boxRef} width={120} height={120}>
+      <p>
+        {content || 'carregando...'}
+      </p>
+    </ScrollableBox>
+    <button onClick={() => setPostId(postId + 1)}>
+      somar
+    </button>
+  </div>
 }
 
 export default App;
